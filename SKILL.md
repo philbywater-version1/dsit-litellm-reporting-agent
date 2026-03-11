@@ -98,6 +98,14 @@ Extend `agent.py` to write the final assistant message to a file. Pass
 | `get_spend_by_tag` | Spend totals grouped by request tag |
 | `get_spend_by_team` | Spend totals grouped by team |
 | `get_model_list` | List configured models on the proxy |
+| `get_user_info` | Per-user spend, budget cap, remaining budget, assigned keys |
+| `get_user_daily_activity` |  Day-by-day usage by model/provider — enables trend queries |
+| `get_key_info` | Per-key spend, assigned user, recent activity |  
+| `get_team_info` | Team budget cap, spend, remaining, member list |
+| `get_customer_info` | External end-user/customer spend tracking | 
+| `get_prometheus_metrics` | Latency, error rates, deployment health, in-flight requests |
+    
+
 
 ---
 

@@ -127,6 +127,52 @@ class LiteLLMClient:
         """Return the list of models configured on the proxy."""
         return self._get("/models")
 
+    # ------------------------------------------------------------------ #
+    # User / key / team detail endpoints                                   #
+    # ------------------------------------------------------------------ #
+
+    def get_user_info(self, user_id: str) -> dict:
+        """Return detailed info for a user: spend, keys, rate limits, budget."""
+        return self._get("/user/info", params={"user_id": user_id})
+
+    def get_user_daily_activity(
+        self,
+        user_id: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+    ) -> dict:
+        """Return daily usage broken down by model, provider, and API key."""
+        params: dict = {}
+        if user_id:
+            params["user_id"] = user_id
+        if start_date:
+            params["start_date"] = start_date
+        if end_date:
+            params["end_date"] = end_date
+        return self._get("/user/daily/activity", params=params)
+
+    def get_key_info(self, key: str) -> dict:
+        """Return spend, expiry, assigned models, and remaining budget for a key."""
+        return self._get("/key/info", params={"key": key})
+
+    def get_team_info(self, team_id: str) -> dict:
+        """Return team spend, budget cap, remaining budget, and members."""
+        return self._get("/team/info", params={"team_id": team_id})
+
+    def get_customer_info(self, customer_id: str) -> dict:
+        """Return spend and budget info for an external end-user/customer."""
+        return self._get("/customer/info", params={"end_user_id": customer_id})
+
+    # ------------------------------------------------------------------ #
+    # Prometheus metrics                                                   #
+    # ------------------------------------------------------------------ #
+
+    def get_prometheus_metrics(self) -> dict:
+        """Return parsed Prometheus metrics (latency, errors, budgets, health)."""
+        response = self._client.get("/metrics")
+        response.raise_for_status()
+        return {"raw": response.text}
+
     def close(self) -> None:
         self._client.close()
 

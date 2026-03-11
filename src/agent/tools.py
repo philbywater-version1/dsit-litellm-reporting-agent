@@ -120,6 +120,104 @@ TOOLS: list[dict] = [
         "description": "List all models currently configured on the LiteLLM proxy.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "name": "get_user_info",
+        "description": (
+            "Fetch detailed info for a specific user: total spend, assigned API keys, "
+            "rate limits, budget cap, and remaining budget."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string",
+                    "description": "The user ID to look up.",
+                },
+            },
+            "required": ["user_id"],
+        },
+    },
+    {
+        "name": "get_user_daily_activity",
+        "description": (
+            "Fetch daily usage activity broken down by model, provider, and API key. "
+            "Optionally filter by user and/or date range. Use this for trend analysis "
+            "and day-by-day comparisons."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string",
+                    "description": "Filter to a specific user ID.",
+                },
+                "start_date": {"type": "string", "description": "YYYY-MM-DD"},
+                "end_date": {"type": "string", "description": "YYYY-MM-DD"},
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_key_info",
+        "description": (
+            "Fetch detailed info for a specific API key: spend in USD, expiry date, "
+            "assigned models, and remaining budget."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "description": "The API key (or key alias) to look up.",
+                },
+            },
+            "required": ["key"],
+        },
+    },
+    {
+        "name": "get_team_info",
+        "description": (
+            "Fetch detailed info for a specific team: spend, budget cap, remaining "
+            "budget, and member list. Use this to check if a team is near its limit."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "team_id": {
+                    "type": "string",
+                    "description": "The team ID to look up.",
+                },
+            },
+            "required": ["team_id"],
+        },
+    },
+    {
+        "name": "get_customer_info",
+        "description": (
+            "Fetch spend and budget info for an external end-user or customer "
+            "(tracked via the 'user' field in requests)."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "description": "The external customer / end-user ID.",
+                },
+            },
+            "required": ["customer_id"],
+        },
+    },
+    {
+        "name": "get_prometheus_metrics",
+        "description": (
+            "Fetch raw Prometheus metrics from the proxy. Includes request latency "
+            "(total and LLM API), error/failure rates, remaining team and key budgets, "
+            "deployment health state, and in-flight request counts. Use this for "
+            "reliability and performance questions."
+        ),
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
 ]
 
 
@@ -181,5 +279,27 @@ def _execute(name: str, inp: dict[str, Any], client: LiteLLMClient) -> Any:
 
     if name == "get_model_list":
         return client.get_model_list()
+
+    if name == "get_user_info":
+        return client.get_user_info(user_id=inp["user_id"])
+
+    if name == "get_user_daily_activity":
+        return client.get_user_daily_activity(
+            user_id=inp.get("user_id"),
+            start_date=inp.get("start_date"),
+            end_date=inp.get("end_date"),
+        )
+
+    if name == "get_key_info":
+        return client.get_key_info(key=inp["key"])
+
+    if name == "get_team_info":
+        return client.get_team_info(team_id=inp["team_id"])
+
+    if name == "get_customer_info":
+        return client.get_customer_info(customer_id=inp["customer_id"])
+
+    if name == "get_prometheus_metrics":
+        return client.get_prometheus_metrics()
 
     raise ValueError(f"Unknown tool: {name}")

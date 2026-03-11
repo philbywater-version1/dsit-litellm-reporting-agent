@@ -34,6 +34,65 @@ def test_get_spend_logs_passes_filters():
     )
 
 
+def test_get_user_info():
+    client = make_client(get_user_info={"user_id": "alice", "spend": 2.50, "max_budget": 10.0})
+    result = json.loads(dispatch_tool("get_user_info", {"user_id": "alice"}, client))
+    assert result["user_id"] == "alice"
+    client.get_user_info.assert_called_once_with(user_id="alice")
+
+
+def test_get_user_daily_activity_passes_filters():
+    client = make_client(get_user_daily_activity={"data": []})
+    dispatch_tool(
+        "get_user_daily_activity",
+        {"user_id": "alice", "start_date": "2024-01-01", "end_date": "2024-01-31"},
+        client,
+    )
+    client.get_user_daily_activity.assert_called_once_with(
+        user_id="alice",
+        start_date="2024-01-01",
+        end_date="2024-01-31",
+    )
+
+
+def test_get_user_daily_activity_no_filters():
+    client = make_client(get_user_daily_activity={"data": []})
+    dispatch_tool("get_user_daily_activity", {}, client)
+    client.get_user_daily_activity.assert_called_once_with(
+        user_id=None,
+        start_date=None,
+        end_date=None,
+    )
+
+
+def test_get_key_info():
+    client = make_client(get_key_info={"key": "sk-abc", "spend": 0.75, "expires": "2025-12-31"})
+    result = json.loads(dispatch_tool("get_key_info", {"key": "sk-abc"}, client))
+    assert result["key"] == "sk-abc"
+    client.get_key_info.assert_called_once_with(key="sk-abc")
+
+
+def test_get_team_info():
+    client = make_client(get_team_info={"team_id": "eng", "spend": 5.0, "max_budget": 50.0})
+    result = json.loads(dispatch_tool("get_team_info", {"team_id": "eng"}, client))
+    assert result["team_id"] == "eng"
+    client.get_team_info.assert_called_once_with(team_id="eng")
+
+
+def test_get_customer_info():
+    client = make_client(get_customer_info={"end_user_id": "cust-1", "spend": 1.10})
+    result = json.loads(dispatch_tool("get_customer_info", {"customer_id": "cust-1"}, client))
+    assert result["end_user_id"] == "cust-1"
+    client.get_customer_info.assert_called_once_with(customer_id="cust-1")
+
+
+def test_get_prometheus_metrics():
+    client = make_client(get_prometheus_metrics={"raw": "# HELP litellm_spend_metric\n..."})
+    result = json.loads(dispatch_tool("get_prometheus_metrics", {}, client))
+    assert "raw" in result
+    client.get_prometheus_metrics.assert_called_once()
+
+
 def test_dispatch_unknown_tool_returns_error():
     client = MagicMock()
     result = json.loads(dispatch_tool("nonexistent_tool", {}, client))

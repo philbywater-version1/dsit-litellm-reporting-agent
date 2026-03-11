@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "WebFetch(domain:docs.litellm.ai)",
+      "WebFetch(domain:litellm-api.up.railway.app)",
+      "WebSearch",
+      "Bash(uv add:*)"
     ]
   }
 }
