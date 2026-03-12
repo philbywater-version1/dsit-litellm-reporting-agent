@@ -9,7 +9,8 @@
       "Bash(source .env 2>/dev/null; curl -s \"https://licenseportal.aiengineeringlab.co.uk/v1/models\" -H \"Authorization: Bearer ${LITELLM_API_KEY:-sk-LtwlzAi6TbyfE1npP_yS7Q}\" | python3 -m json.tool 2>/dev/null || echo \"curl failed\")",
       "Bash(source .env 2>/dev/null && curl -s \"${LITELLM_BASE_URL}/v1/models\" -H \"Authorization: Bearer ${LITELLM_API_KEY}\" | python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(m['id']\\) for m in data.get\\('data',[]\\)]\" 2>/dev/null || echo \"Could not read .env or list models\")",
       "Bash(source .env && ANTHROPIC_MODEL=\"eu.anthropic.claude-sonnet-4-6\" uv run litellm-agent \"what is the total spend for March for NHS England\")",
-      "Bash(source .env && uv run litellm-agent \"what is the total spend for March for NHS England\")"
+      "Bash(source .env && uv run litellm-agent \"what is the total spend for March for NHS England\")",
+      "Bash(find /Users/phil.bywater/dsit-litellm-reporting-agent -name \"README*\" -o -name \"*.md\" 2>/dev/null | grep -v \".git\" | grep -v \".venv\")"
     ]
   }
 }
