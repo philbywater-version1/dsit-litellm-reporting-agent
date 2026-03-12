@@ -33,6 +33,12 @@ period's data.
 
 Be concise but thorough. If the data suggests anomalies or notable trends, \
 highlight them.
+
+When the user asks to save results to a file, use the write_file tool. \
+Choose an appropriate filename based on the report type and date range \
+(e.g. 'spend_by_user_march_2026.csv'). For CSV files write a proper \
+header row followed by data rows. For JSON files write valid JSON. \
+Always confirm the file path after saving.
 """
 
 
@@ -61,7 +67,7 @@ def run(prompt: str) -> None:
             # Stream the response so we get text in real time
             with client.messages.stream(
                 model=MODEL,
-                max_tokens=4096,
+                max_tokens=16000,
                 system=_build_system_prompt(),
                 tools=TOOLS,  # type: ignore[arg-type]
                 messages=messages,  # type: ignore[arg-type]

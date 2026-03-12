@@ -7,6 +7,8 @@ or JSON string that Claude can reason over.
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
 from typing import Any
 
 from agent.litellm_client import LiteLLMClient
@@ -218,7 +220,47 @@ TOOLS: list[dict] = [
         ),
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "name": "write_file",
+        "description": (
+            "Write text content to a file in the output folder. Use this to save "
+            "reports as CSV or JSON files. The filename should include the extension "
+            "(e.g. 'spend_report.csv' or 'spend_report.json'). "
+            "Returns the absolute path of the written file."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string",
+                    "description": "Filename including extension, e.g. 'report.csv'.",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The full text content to write to the file.",
+                },
+            },
+            "required": ["filename", "content"],
+        },
+    },
 ]
+
+
+# ------------------------------------------------------------------ #
+# File output helper                                                  #
+# ------------------------------------------------------------------ #
+
+_OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", Path(__file__).parent.parent.parent / "output"))
+
+
+def _write_output_file(filename: str, content: str) -> dict:
+    """Write content to a file in the output directory."""
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Sanitise filename — strip any path components to prevent traversal
+    safe_name = Path(filename).name
+    dest = _OUTPUT_DIR / safe_name
+    dest.write_text(content, encoding="utf-8")
+    return {"written": True, "path": str(dest.resolve())}
 
 
 # ------------------------------------------------------------------ #
@@ -301,5 +343,8 @@ def _execute(name: str, inp: dict[str, Any], client: LiteLLMClient) -> Any:
 
     if name == "get_prometheus_metrics":
         return client.get_prometheus_metrics()
+
+    if name == "write_file":
+        return _write_output_file(inp["filename"], inp["content"])
 
     raise ValueError(f"Unknown tool: {name}")
