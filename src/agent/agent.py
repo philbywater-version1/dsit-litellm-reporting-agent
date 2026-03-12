@@ -39,7 +39,7 @@ highlight them.
 def _build_system_prompt() -> str:
     return _SYSTEM_PROMPT_TEMPLATE.format(today=date.today().isoformat())
 
-MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-6")
+MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 
 console = Console()
 
